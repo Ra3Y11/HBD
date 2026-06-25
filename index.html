@@ -592,8 +592,8 @@
 
   <div id="login">
     <div class="card">
-      <div class="math-question" dir="ltr">∛21952 ÷ 2 = ?</div>
-      <input id="pass" type="password" placeholder="چه؟" autofocus>
+      <div class="math-question" dir="ltr">عدد بفرمایید</div>
+      <input id="pass" type="password" placeholder="خوده رابی میدونه" autofocus>
       <button onclick="enterSite()">رابی کیه؟</button>
       <div id="err"></div>
     </div>
@@ -936,7 +936,7 @@
       window.enterSite = function() {
         const pass = document.getElementById('pass');
         const err = document.getElementById('err');
-        if (pass.value !== "14") {
+        if (pass.value !== "101") {
           err.textContent = 'دویوغ گفتی';
           return;
         }
