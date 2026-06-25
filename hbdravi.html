@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>HBD Ravi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      cursor: auto !important;
+    }
+    body {
+      font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+      background: #0b0b1a;
+      color: #f0f0ff;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+      position: relative;
+    }
+    #login,
+    #main,
+    #letter {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #login {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('space-bg.jpg') center/cover fixed no-repeat;
+      z-index: 30;
+    }
+    #login::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.3);
+      z-index: -1;
+    }
+    .card {
+      background: rgba(18, 18, 40, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 28px 22px;
+      border-radius: 40px;
+      width: min(92vw, 370px);
+      border: 1px solid rgba(255, 215, 150, 0.2);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .card .math-question {
+      direction: ltr;
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: #f7e3c0;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+    .card input {
+      width: 100%;
+      padding: 16px 14px;
+      border-radius: 60px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 1.2rem;
+      text-align: center;
+      letter-spacing: 2px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 200, 130, 0.2);
+      outline: none;
+      transition: 0.3s;
+      cursor: text !important;
+    }
+    .card input:focus {
+      border-color: #f7c873;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .card button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 20px;
+      border-radius: 60px;
+      border: none;
+      background: linear-gradient(145deg, #f7c873, #dba44b);
+      color: #1a1420;
+      font-weight: bold;
+      font-size: 1.3rem;
+      cursor: pointer !important;
+      transition: 0.2s;
+      box-shadow: 0 6px 0 #7a5f2b;
+      letter-spacing: 1px;
+    }
+    .card button:active {
+      transform: scale(0.96);
+      box-shadow: 0 2px 0 #7a5f2b;
+    }
+    #err {
+      color: #ffae9e;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      min-height: 24px;
+    }
+
+    /* ===== MAIN ===== */
+    #main {
+      display: none;
+      background: url('space-bg.jpg') center/cover fixed no-repeat;
+      z-index: 10;
+      overflow: visible !important;
+    }
+
+    #main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 210, 140, .15), transparent 40%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    #main::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(80, 120, 255, .08), transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(180, 100, 255, .06), transparent 35%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle 4s infinite alternate;
+      box-shadow:
+        0 0 4px white,
+        0 0 8px white,
+        0 0 12px rgba(255, 255, 255, .8);
+    }
+    @keyframes twinkle {
+      0% {
+        opacity: 0.02;
+        transform: scale(0.2);
+      }
+      100% {
+        opacity: 0.6;
+        transform: scale(1.6);
+      }
+    }
+
+    #meteors {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .meteor-head {
+      position: absolute;
+      width: 1.5px;
+      height: 1.5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.05);
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0.1;
+    }
+    .meteor-trail {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .meteor-trail polyline {
+      stroke: rgba(255, 240, 210, 0.6);
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      fill: none;
+      filter: blur(4px);
+    }
+
+    /* ===== سیاره اصلی ===== */
+    .planet-wrap {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(78vw, 580px);
+      height: min(78vw, 580px);
+      overflow: visible !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: floatPlanet 6s ease-in-out infinite;
+      z-index: 5;
+    }
+    @keyframes floatPlanet {
+      0% {
+        transform: translate(-50%, -50%);
+      }
+      50% {
+        transform: translate(-50%, -55%);
+      }
+      100% {
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .planet {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: visible !important;
+      background: none !important;
+      border-radius: 0 !important;
+    }
+    .planet img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 0 !important;
+      filter:
+        drop-shadow(0 0 8px rgba(255, 220, 170, .30))
+        drop-shadow(0 0 20px rgba(255, 220, 170, .12));
+    }
+
+    .planet::before {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle,
+          transparent 65%,
+          rgba(255, 220, 170, .20) 82%,
+          rgba(255, 255, 255, .35) 100%);
+      filter: blur(4px);
+      z-index: 2;
+    }
+
+    .planet-glow {
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle,
+          rgba(255, 210, 140, .10) 35%,
+          rgba(255, 210, 140, .05) 60%,
+          transparent 85%);
+      filter: blur(25px);
+      pointer-events: none;
+      animation: glowPulse 4s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+    @keyframes glowPulse {
+      0% {
+        transform: translate(-50%, -50%) scale(0.85);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1.10);
+        opacity: 0.8;
+      }
+    }
+
+    /* ===== سیاره‌های فرعی (هاله‌ها کاملاً حذف شدند) ===== */
+    .smallPlanet {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.9;
+      animation: drift linear infinite alternate;
+      overflow: visible !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      /* فقط یک سایه نرم خیلی ملایم برای جدایی از بک‌گراند */
+      filter: drop-shadow(0 0 4px rgba(200, 220, 255, 0.05));
+    }
+    .smallPlanet .inner {
+      width: 88%;
+      height: 88%;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+    }
+    .smallPlanet img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 50%;
+    }
+
+    /* Rim Light خیلی ملایم لبه (بدون هاله) */
+    .smallPlanet .inner::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 50%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle,
+          transparent 70%,
+          rgba(200, 220, 255, 0.06) 85%,
+          rgba(255, 255, 255, 0.10) 100%);
+      filter: blur(2px);
+      z-index: 2;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translateX(-12px) scale(0.95);
+      }
+      100% {
+        transform: translateX(12px) scale(1.05);
+      }
+    }
+
+    .openBtn {
+      position: absolute;
+      left: 50%;
+      top: calc(50% + 220px);
+      transform: translateX(-50%);
+      padding: 14px 28px;
+      width: auto;
+      background: rgba(245, 215, 150, 0.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 215, 150, 0.20);
+      border-radius: 999px;
+      color: #f7e3c0;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      cursor: pointer !important;
+      transition: 0.25s;
+      box-shadow: none;
+      z-index: 15;
+      white-space: nowrap;
+    }
+    .openBtn:active {
+      transform: translateX(-50%) scale(0.93);
+      background: rgba(245, 215, 150, 0.20);
+    }
+
+    #warp {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 25;
+      background: #020212;
+    }
+    #warp canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    #musicPlayer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 50;
+      background: rgba(10, 10, 30, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 60px;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 215, 150, 0.08);
+      box-shadow: none;
+      pointer-events: auto;
+      transition: 0.3s;
+      cursor: pointer !important;
+    }
+    #musicPlayer.hidden {
+      display: none;
+    }
+    #musicPlayer .track-name {
+      color: #cfc5b0;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      font-weight: 300;
+    }
+    #musicPlayer .play-icon {
+      color: #f7e3c0;
+      font-size: 1.2rem;
+      line-height: 1;
+      transition: 0.2s;
+    }
+    #musicPlayer:active .play-icon {
+      transform: scale(0.85);
+    }
+
+    #letter {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 16px;
+      z-index: 40;
+    }
+    .letterBox {
+      width: min(850px, 90vw);
+      max-height: 80vh;
+      background:
+        linear-gradient(180deg,
+          rgba(20, 20, 35, .95),
+          rgba(12, 12, 24, .95));
+      border-radius: 40px;
+      padding: 24px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr 1fr;
+      gap: 18px;
+      border: 1px solid rgba(255, 215, 150, 0.08);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+      overflow-y: auto;
+    }
+    .polaroid {
+      background: #f5f0ea;
+      color: #1a1a2a;
+      padding: 14px 14px 20px;
+      border-radius: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      transform: rotate(var(--rot, -1deg));
+      transition: 0.2s;
+      position: relative;
+    }
+    .polaroid:nth-child(1) {
+      --rot: 2deg;
+    }
+    .polaroid:nth-child(3) {
+      --rot: -2.5deg;
+    }
+    .polaroid img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      background: #bbb;
+      border-radius: 4px;
+      display: block;
+    }
+    .text {
+      line-height: 2.1;
+      text-align: right;
+      padding: 8px 6px;
+      color: #f2eee5;
+      font-size: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .text h2 {
+      color: #f7d99e;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .text p {
+      margin: 6px 0;
+    }
+
+    #breadCursor {
+      display: none !important;
+    }
+
+    @media (max-width: 700px) {
+      .letterBox {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px 16px;
+        max-height: 85vh;
+      }
+      .polaroid {
+        max-width: 260px;
+        margin: 0 auto;
+      }
+      .openBtn {
+        top: calc(50% + 180px);
+        padding: 12px 22px;
+        font-size: 0.9rem;
+      }
+      .planet-wrap {
+        width: min(82vw, 420px);
+        height: min(82vw, 420px);
+      }
+      .text h2 {
+        font-size: 1.5rem;
+      }
+      #musicPlayer {
+        top: 12px;
+        right: 12px;
+        padding: 6px 14px;
+      }
+      #musicPlayer .track-name {
+        font-size: 0.75rem;
+        max-width: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #musicPlayer .play-icon {
+        font-size: 1rem;
+      }
+      .smallPlanet {
+        width: 55px !important;
+        height: 55px !important;
+      }
+      .smallPlanet:nth-child(2) {
+        width: 42px !important;
+        height: 42px !important;
+      }
+      .smallPlanet:nth-child(3) {
+        width: 65px !important;
+        height: 65px !important;
+      }
+      .smallPlanet:nth-child(4) {
+        width: 45px !important;
+        height: 45px !important;
+      }
+    }
+    @media (max-width: 400px) {
+      .openBtn {
+        top: calc(50% + 160px);
+        padding: 10px 18px;
+        font-size: 0.8rem;
+      }
+      .planet-wrap {
+        width: min(88vw, 340px);
+        height: min(88vw, 340px);
+      }
+      .smallPlanet {
+        width: 42px !important;
+        height: 42px !important;
+      }
+      .smallPlanet:nth-child(2) {
+        width: 32px !important;
+        height: 32px !important;
+      }
+      .smallPlanet:nth-child(3) {
+        width: 50px !important;
+        height: 50px !important;
+      }
+      .smallPlanet:nth-child(4) {
+        width: 35px !important;
+        height: 35px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="musicPlayer" class="hidden">
+    <span class="play-icon" id="playIcon">▶</span>
+    <span class="track-name">🎵 space song</span>
+  </div>
+
+  <div id="login">
+    <div class="card">
+      <div class="math-question" dir="ltr">∛21952 ÷ 2 = ?</div>
+      <input id="pass" type="password" placeholder="این اون نیست" autofocus>
+      <button onclick="enterSite()">رابی کیه؟</button>
+      <div id="err"></div>
+    </div>
+  </div>
+
+  <div id="warp"></div>
+
+  <div id="main">
+    <div id="stars"></div>
+    <div id="meteors"></div>
+
+    <!-- سیاره‌های فرعی (هاله‌ها کاملاً حذف شدند) -->
+    <div class="smallPlanet" style="width:70px;height:70px;left:5%;top:12%;animation-duration:7s;">
+      <div class="inner"><img src="planet1.png" alt=""></div>
+    </div>
+    <div class="smallPlanet" style="width:55px;height:55px;left:86%;top:16%;animation-duration:11s;">
+      <div class="inner"><img src="planet2.png" alt=""></div>
+    </div>
+    <div class="smallPlanet" style="width:85px;height:85px;left:78%;top:67%;animation-duration:9s;">
+      <div class="inner"><img src="planet3.png" alt=""></div>
+    </div>
+    <div class="smallPlanet" style="width:60px;height:60px;left:8%;top:80%;animation-duration:13s;">
+      <div class="inner"><img src="planet4.png" alt=""></div>
+    </div>
+
+    <!-- سیاره اصلی -->
+    <div class="planet-wrap">
+      <div class="planet-glow"></div>
+      <div class="planet">
+        <img src="planet.png" alt="سیاره اصلی">
+      </div>
+    </div>
+
+    <button class="openBtn" onclick="openLetter()">چخبره؟</button>
+    <audio id="music" loop preload="auto">
+      <source src="space song.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div id="letter">
+    <div class="letterBox">
+      <div class="polaroid"><img src="photo1.jpg" alt="photo1"></div>
+      <div class="text">
+        <h2>بهبهبه تولدت مبارک🎂</h2>
+        <p>خب بفرمایید اینم فضا مضا و دیگه بقیش با خودتون</p>
+        <p>تولد شما مبارک (البته که من اصلیه ام) بعد اینکه امیدواریم سایه‌تون بالاسر دانش آموزاتون مستدام باشه(دانش آموزا هم زیر تریلی) خلاصه عشق و محبت فدایی داری ماچ و بوس😛😛</p>
+        <p style="margin-top:8px;color:#d4c9b0;">-از طرف گربه مشکی موردعلاقت </p>
+      </div>
+      <div class="polaroid"><img src="photo2.jpg" alt="photo2"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ============ ستاره‌ها ============
+      const starsContainer = document.getElementById('stars');
+      const starCount = 300;
+      for (let i = 0; i < starCount; i++) {
+        let s = document.createElement('div');
+        s.className = 'star';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.width = (Math.random() * 2.5 + 0.3) + 'px';
+        s.style.height = s.style.width;
+        s.style.animationDelay = Math.random() * 8 + 's';
+        s.style.animationDuration = (1.8 + Math.random() * 4) + 's';
+        s.style.opacity = 0.02 + Math.random() * 0.15;
+        starsContainer.appendChild(s);
+      }
+
+      // ============ شهاب‌سنگ ============
+      const meteorsContainer = document.getElementById('meteors');
+
+      function createMeteor() {
+        const startX = -30;
+        const startY = 20 + Math.random() * 55;
+
+        const head = document.createElement('div');
+        head.className = 'meteor-head';
+        head.style.left = startX + 'px';
+        head.style.top = startY + 'px';
+        meteorsContainer.appendChild(head);
+
+        const trailPoints = [];
+        const maxTrail = 65;
+        const speedX = 12 + Math.random() * 10;
+        const speedY = 6 + Math.random() * 7;
+        let x = startX;
+        let y = startY;
+        let dead = false;
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'meteor-trail');
+        svg.style.position = 'absolute';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        svg.style.pointerEvents = 'none';
+        const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        polyline.setAttribute('stroke', 'rgba(255,240,210,0.6)');
+        polyline.setAttribute('stroke-width', '1.6');
+        polyline.setAttribute('stroke-linecap', 'round');
+        polyline.setAttribute('fill', 'none');
+        polyline.setAttribute('filter', 'blur(4px)');
+        svg.appendChild(polyline);
+        meteorsContainer.appendChild(svg);
+
+        let lastTime = performance.now();
+        let active = true;
+
+        function animateMeteor(time) {
+          if (!active) return;
+
+          const delta = (time - lastTime) / 16;
+          lastTime = time;
+
+          if (!dead) {
+            x += speedX * delta;
+            y += speedY * delta;
+            head.style.left = x + 'px';
+            head.style.top = y + 'px';
+            trailPoints.push({ x, y });
+            if (trailPoints.length > maxTrail) {
+              trailPoints.shift();
+            }
+            if (x > window.innerWidth + 150 || y > window.innerHeight + 150) {
+              dead = true;
+            }
+          }
+
+          if (dead) {
+            if (trailPoints.length > 0) {
+              trailPoints.shift();
+              if (trailPoints.length > 10) trailPoints.shift();
+            } else {
+              active = false;
+              head.remove();
+              svg.remove();
+              return;
+            }
+          }
+
+          const pointsStr = trailPoints.map(p => `${p.x},${p.y}`).join(' ');
+          polyline.setAttribute('points', pointsStr);
+
+          if (trailPoints.length > 5) {
+            const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            const gradId = `grad-${Date.now()}-${Math.random()}`;
+            gradient.setAttribute('id', gradId);
+            gradient.setAttribute('x1', '0%');
+            gradient.setAttribute('y1', '0%');
+            gradient.setAttribute('x2', '100%');
+            gradient.setAttribute('y2', '0%');
+            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.setAttribute('stop-color', 'rgba(255,255,255,0.01)');
+            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop2.setAttribute('offset', '50%');
+            stop2.setAttribute('stop-color', 'rgba(255,240,210,0.25)');
+            const stop3 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop3.setAttribute('offset', '100%');
+            stop3.setAttribute('stop-color', 'rgba(255,240,210,0.6)');
+            gradient.appendChild(stop1);
+            gradient.appendChild(stop2);
+            gradient.appendChild(stop3);
+            svg.appendChild(gradient);
+            polyline.setAttribute('stroke', `url(#${gradId})`);
+          }
+
+          requestAnimationFrame(animateMeteor);
+        }
+
+        requestAnimationFrame(animateMeteor);
+
+        setTimeout(() => {
+          if (active) {
+            dead = true;
+          }
+        }, 5000);
+      }
+
+      setInterval(createMeteor, 8000);
+      setTimeout(createMeteor, 300);
+      setTimeout(createMeteor, 1100);
+      setTimeout(createMeteor, 2000);
+
+      // ============ THREE.JS 3D WARP ============
+      let warpScene, warpCamera, warpRenderer, warpParticles;
+      let warpActive = false;
+      let warpStartTime = 0;
+      const WARP_DURATION = 2400;
+
+      function initWarp() {
+        const container = document.getElementById('warp');
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        warpScene = new THREE.Scene();
+        warpScene.background = new THREE.Color(0x020212);
+        warpCamera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        warpCamera.position.z = 30;
+        warpRenderer = new THREE.WebGLRenderer({ antialias: true });
+        warpRenderer.setSize(width, height);
+        warpRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(warpRenderer.domElement);
+
+        const particleCount = 4000;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+          const radius = 30 + Math.random() * 180;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos((Math.random() * 2) - 1);
+          positions[i * 3] = radius * Math.sin(theta) * Math.cos(phi);
+          positions[i * 3 + 1] = radius * Math.sin(theta) * Math.sin(phi);
+          positions[i * 3 + 2] = radius * Math.cos(theta);
+          const color = new THREE.Color().setHSL(0.6 + Math.random() * 0.2, 0.8, 0.5 + Math.random() * 0.4);
+          colors[i * 3] = color.r;
+          colors[i * 3 + 1] = color.g;
+          colors[i * 3 + 2] = color.b;
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const material = new THREE.PointsMaterial({
+          size: 0.6,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.95,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true
+        });
+        warpParticles = new THREE.Points(geometry, material);
+        warpScene.add(warpParticles);
+        window.addEventListener('resize', () => {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          warpCamera.aspect = w / h;
+          warpCamera.updateProjectionMatrix();
+          warpRenderer.setSize(w, h);
+        });
+      }
+
+      function startWarpAnimation() {
+        if (!warpScene) initWarp();
+        const container = document.getElementById('warp');
+        container.style.display = 'block';
+        warpActive = true;
+        warpStartTime = performance.now();
+        animateWarp();
+      }
+
+      function animateWarp() {
+        if (!warpActive) return;
+        const elapsed = performance.now() - warpStartTime;
+        const progress = Math.min(elapsed / WARP_DURATION, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        warpParticles.rotation.x += 0.012;
+        warpParticles.rotation.y += 0.02;
+        warpParticles.rotation.z += 0.008;
+        const scale = 1 + ease * 3.5;
+        warpParticles.scale.set(scale, scale, scale);
+        const opacity = 1 - Math.pow(ease, 1.8);
+        warpParticles.material.opacity = opacity;
+        warpRenderer.render(warpScene, warpCamera);
+        if (progress < 1) {
+          requestAnimationFrame(animateWarp);
+        } else {
+          warpActive = false;
+          const container = document.getElementById('warp');
+          container.style.display = 'none';
+          document.getElementById('main').style.display = 'block';
+          const music = document.getElementById('music');
+          music.volume = 0.08;
+          music.play().catch(() => {});
+          isPlaying = true;
+          updatePlayIcon();
+          showPlayer();
+          let vol = 0.08;
+          const volInterval = setInterval(() => {
+            vol += 0.025;
+            if (vol >= 0.5) { vol = 0.5;
+              clearInterval(volInterval); }
+            music.volume = vol;
+          }, 300);
+        }
+      }
+
+      // ===== موزیک پلیر =====
+      const music = document.getElementById('music');
+      const playerEl = document.getElementById('musicPlayer');
+      const playIcon = document.getElementById('playIcon');
+      let isPlaying = false;
+
+      function updatePlayIcon() {
+        playIcon.textContent = isPlaying ? '⏸' : '▶';
+      }
+
+      playerEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isPlaying) {
+          music.pause();
+          isPlaying = false;
+        } else {
+          music.play().catch(() => {});
+          isPlaying = true;
+          if (music.volume < 0.1) music.volume = 0.4;
+        }
+        updatePlayIcon();
+      });
+
+      music.addEventListener('ended', () => {
+        if (music.loop) {
+          music.play().catch(() => {});
+          isPlaying = true;
+          updatePlayIcon();
+        }
+      });
+
+      function showPlayer() {
+        playerEl.classList.remove('hidden');
+      }
+
+      window.enterSite = function() {
+        const pass = document.getElementById('pass');
+        const err = document.getElementById('err');
+        if (pass.value !== "جمله پرانتزی") {
+          err.textContent = 'دویوغ گفتی';
+          return;
+        }
+        document.getElementById('login').style.display = 'none';
+        startWarpAnimation();
+      };
+
+      window.openLetter = function() {
+        document.getElementById('letter').style.display = 'flex';
+      };
+
+      document.getElementById('letter').addEventListener('click', function(e) {
+        if (e.target === this || e.target.id === 'letter') {
+          this.style.display = 'none';
+        }
+      });
+
+      document.getElementById('pass').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') window.enterSite();
+      });
+
+      initWarp();
+    })();
+  </script>
+</body>
+</html>
