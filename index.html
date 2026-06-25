@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>HBD Ravi</title>
+  <title>Tea Planet Birthday</title>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
   </script>
@@ -294,7 +294,7 @@
       }
     }
 
-    /* ===== سیاره‌های فرعی (هاله‌ها کاملاً حذف شدند) ===== */
+    /* ===== سیاره‌های فرعی ===== */
     .smallPlanet {
       position: absolute;
       border-radius: 50%;
@@ -305,7 +305,6 @@
       align-items: center;
       justify-content: center;
       z-index: 4;
-      /* فقط یک سایه نرم خیلی ملایم برای جدایی از بک‌گراند */
       filter: drop-shadow(0 0 4px rgba(200, 220, 255, 0.05));
     }
     .smallPlanet .inner {
@@ -323,7 +322,6 @@
       border-radius: 50%;
     }
 
-    /* Rim Light خیلی ملایم لبه (بدون هاله) */
     .smallPlanet .inner::before {
       content: "";
       position: absolute;
@@ -595,8 +593,8 @@
   <div id="login">
     <div class="card">
       <div class="math-question" dir="ltr">∛21952 ÷ 2 = ?</div>
-      <input id="pass" type="password" placeholder="این اون نیست" autofocus>
-      <button onclick="enterSite()">رابی کیه؟</button>
+      <input id="pass" type="password" placeholder="عدد مخفی" autofocus>
+      <button onclick="enterSite()">ورود</button>
       <div id="err"></div>
     </div>
   </div>
@@ -607,7 +605,7 @@
     <div id="stars"></div>
     <div id="meteors"></div>
 
-    <!-- سیاره‌های فرعی (هاله‌ها کاملاً حذف شدند) -->
+    <!-- سیاره‌های فرعی -->
     <div class="smallPlanet" style="width:70px;height:70px;left:5%;top:12%;animation-duration:7s;">
       <div class="inner"><img src="planet1.png" alt=""></div>
     </div>
@@ -629,9 +627,11 @@
       </div>
     </div>
 
-    <button class="openBtn" onclick="openLetter()">چخبره؟</button>
-    <audio id="music" loop preload="auto">
-      <source src="space song.mp3" type="audio/mpeg">
+    <button class="openBtn" onclick="openLetter()">📜 باز کردن نامه</button>
+    
+    <!-- عنصر صوتی با preload و controls برای بهبود پخش -->
+    <audio id="music" loop preload="auto" controls style="display:none;">
+      <source src="shadow.mp3" type="audio/mpeg">
     </audio>
   </div>
 
@@ -642,7 +642,7 @@
         <h2>بهبهبه تولدت مبارک🎂</h2>
         <p>خب بفرمایید اینم فضا مضا و دیگه بقیش با خودتون</p>
         <p>تولد شما مبارک (البته که من اصلیه ام) بعد اینکه امیدواریم سایه‌تون بالاسر دانش آموزاتون مستدام باشه(دانش آموزا هم زیر تریلی) خلاصه عشق و محبت فدایی داری ماچ و بوس😛😛</p>
-        <p style="margin-top:8px;color:#d4c9b0;">-از طرف گربه مشکی </p>
+        <p style="margin-top:8px;color:#d4c9b0;">-از طرف گربه مشکی موردعلاقت </p>
       </div>
       <div class="polaroid"><img src="photo2.jpg" alt="photo2"></div>
     </div>
@@ -869,17 +869,28 @@
           const container = document.getElementById('warp');
           container.style.display = 'none';
           document.getElementById('main').style.display = 'block';
+          
+          // ===== پخش آهنگ با load و تاخیر =====
           const music = document.getElementById('music');
+          music.load(); // بارگذاری مجدد
           music.volume = 0.08;
-          music.play().catch(() => {});
+          
+          setTimeout(() => {
+            music.play().catch(err => console.log('Audio error:', err));
+          }, 400);
+          
           isPlaying = true;
           updatePlayIcon();
           showPlayer();
+          
+          // افزایش تدریجی صدا
           let vol = 0.08;
           const volInterval = setInterval(() => {
             vol += 0.025;
-            if (vol >= 0.5) { vol = 0.5;
-              clearInterval(volInterval); }
+            if (vol >= 0.5) {
+              vol = 0.5;
+              clearInterval(volInterval);
+            }
             music.volume = vol;
           }, 300);
         }
@@ -901,6 +912,7 @@
           music.pause();
           isPlaying = false;
         } else {
+          music.load();
           music.play().catch(() => {});
           isPlaying = true;
           if (music.volume < 0.1) music.volume = 0.4;
@@ -910,6 +922,7 @@
 
       music.addEventListener('ended', () => {
         if (music.loop) {
+          music.load();
           music.play().catch(() => {});
           isPlaying = true;
           updatePlayIcon();
@@ -924,7 +937,7 @@
         const pass = document.getElementById('pass');
         const err = document.getElementById('err');
         if (pass.value !== "14") {
-          err.textContent = 'دویوغ گفتی';
+          err.textContent = 'رمز اشتباه است';
           return;
         }
         document.getElementById('login').style.display = 'none';
